@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイピング</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <div class="title">
+            <h1>タイピングゲーム</h1>
+            <div class="marker"></div>
+        </div>
+        <!-- v-if=条件式を記述してtrueの時だけ表示する　@click=クリックしたタイミングでmethodsに記載した関数を実行する -->
+        <button v-if="startFlg!=true" class="startButton mb-20" @click="gameStart">START</button>
+        <div v-if="startFlg">
+            <div class="question mb-20">{{current_Question}}</div>
+            <div v-if="question_counts == current_question_counts" class="clear">Clear!</div>
+            <div class="typeFormWrapper mb-20">
+                <input v-model="typeBox" type="text" id="typeForm" class="typeForm">
+            </div>
+            <div class="gaugeWrapper mb-20">
+                <div v-bind:style="styleObject" class="gauge"></div>
+            </div>
+        </div>
+
+        <div>{{current_question_counts}}/{{question_counts}}</div>
+
+    </div>
+
+    <script>
+        // elで指定したidを持つ範囲をVue.jsインスタンスとする（今回はcontainerクラス部分）
+        new Vue({
+            el: "#app",
+            // dataで変数を定義することができる
+            data: {
+                // ゲームが開始しているかのフラグスタートしていたら単語が出てくる
+                startFlg: "",
+                current_Question: "",
+                questions: [
+                    'apple',
+                    'banana',
+                    'chocolate',
+                    'grape',
+                    'donut',
+                    'espresso'
+                ],
+                typeBox: "",
+                current_question_counts: 0,
+                question_counts: 0,
+            },
+            computed: {
+                styleObject: function () {
+                    width = 100 / this.question_counts * this.current_question_counts + "%";
+                    if (this.current_question_counts == this.question_counts) {
+                        color = "#03a9f4";
+                    } else {
+                        color = "orange";
+                    }
+                    return {
+                        'width': width,
+                        'background-color': color,
+                    }
+                }
+            },
+            methods: {
+                gameStart: function () {
+                    this.startFlg = true;
+                    this.$nextTick(function () {
+                        document.getElementById('typeForm').focus();
+                    })
+                }
+            },
+            mounted: function () {
+                this.current_Question = this.questions[0];
+                this.question_counts = this.questions.length;
+            },
+            watch: {
+                typeBox: function (e) {
+                    if (e == this.current_Question) {
+                        this.questions.splice(0, 1);
+                        this.current_Question = this.questions[0];
+                        this.typeBox = "";
+                        this.current_question_counts = this.current_question_counts + 1;
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
